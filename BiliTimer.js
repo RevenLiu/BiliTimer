@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BiliTimer
 // @namespace    https://github.com/RevenLiu
-// @version      1.0.0
+// @version      1.0.1
 // @description  一个用于Bilibili平台的篡改猴脚本，为B站视频添加定时暂停功能。
 // @author       RevenLiu
 // @license      MIT
@@ -17,9 +17,45 @@
     let countdownTimer = null;
     let remainingSeconds = 0;
 
-    // 添加样式
+    // 监听 B 站原生主题切换
+    function watchTheme() {
+        const themeLink = document.getElementById('__css-map__');
+        const updateTheme = () => {
+            if (!themeLink) return;
+            const isDark = themeLink.href.includes('dark.css');
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        };
+
+        if (themeLink) {
+            updateTheme();
+            const observer = new MutationObserver(updateTheme);
+            observer.observe(themeLink, { attributes: true, attributeFilter: ['href'] });
+        } else {
+            setTimeout(watchTheme, 500);
+        }
+    }
+    watchTheme();
+
     const style = document.createElement('style');
     style.textContent = `
+        :root {
+            --bt-modal-bg: #ffffff;
+            --bt-text-main: #18191c;
+            --bt-text-sub: #61666d;
+            --bt-border: #e3e5e7;
+            --bt-btn-cancel-bg: #f1f2f3;
+            --bt-btn-hover-bg: rgb(227, 229, 231);
+        }
+
+        [data-theme="dark"] {
+            --bt-modal-bg: #17181a;
+            --bt-text-main: #e7e9ed;
+            --bt-text-sub: #9499a0;
+            --bt-border: #3d3d3d;
+            --bt-btn-cancel-bg: #1e2022;
+            --bt-btn-hover-bg: #2f3134;
+        }
+
         .timer-button {
             position: relative;
             display: flex;
@@ -31,7 +67,7 @@
             border-radius: 8px;
             background: var(--graph_bg_thin, #f1f2f3);
             transition: background-color 0.3s;
-            color: var(--text1, #18191c);
+            color: var(--text1, var(--bt-text-main));
             cursor: pointer;
             font-size: 14px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
@@ -41,7 +77,7 @@
         }
 
         .timer-button:hover {
-            background: rgb(227, 229, 231);
+            background: var(--bt-btn-hover-bg);
         }
 
         .timer-button .timer-icon {
@@ -90,7 +126,7 @@
         }
 
         .timer-modal {
-            background: white;
+            background: var(--bt-modal-bg);
             border-radius: 12px;
             padding: 24px;
             width: 400px;
@@ -103,7 +139,7 @@
         .timer-modal-title {
             font-size: 18px;
             font-weight: 600;
-            color: #18191c;
+            color: var(--bt-text-main);
             margin-bottom: 20px;
         }
 
@@ -124,7 +160,7 @@
         .timer-input-label {
             display: block;
             font-size: 13px;
-            color: #61666d;
+            color: var(--bt-text-sub);
             margin-bottom: 6px;
         }
 
@@ -132,8 +168,10 @@
             width: 100%;
             height: 40px;
             padding: 0 12px;
-            border: 1px solid #e3e5e7;
+            border: 1px solid var(--bt-border);
             border-radius: 6px;
+            background: var(--bt-modal-bg);
+            color: var(--bt-text-main);
             font-size: 14px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -155,10 +193,10 @@
 
         .timer-quick-btn {
             padding: 6px 12px;
-            border: 1px solid #e3e5e7;
+            border: 1px solid var(--bt-border);
             border-radius: 6px;
-            background: white;
-            color: #61666d;
+            background: var(--bt-modal-bg);
+            color: var(--bt-text-sub);
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -189,12 +227,12 @@
         }
 
         .timer-modal-btn.cancel {
-            background: #f1f2f3;
-            color: #18191c;
+            background: var(--bt-btn-cancel-bg);
+            color: var(--bt-text-main);
         }
 
         .timer-modal-btn.cancel:hover {
-            background: #e3e5e7;
+            background: var(--bt-btn-hover-bg);
         }
 
         .timer-modal-btn.confirm {
@@ -209,12 +247,12 @@
         }
 
         .timer-modal-btn.stop {
-            background: #ff6b81;
+            background: #ff4757;
             color: white;
         }
 
         .timer-modal-btn.stop:hover {
-            background: #ff4757;
+            background: #ff6b81;
         }
     `;
     document.head.appendChild(style);
