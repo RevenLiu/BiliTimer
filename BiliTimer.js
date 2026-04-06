@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         BiliTimer
 // @namespace    https://github.com/RevenLiu
-// @version      1.0.1
+// @version      1.0.2
 // @description  一个用于Bilibili平台的篡改猴脚本，为B站视频添加定时暂停功能。
 // @author       RevenLiu
 // @license      MIT
 // @icon         https://raw.githubusercontent.com/RevenLiu/BiliTimer/main/Icon.png
 // @match        https://www.bilibili.com/video/*
+// @match        https://www.bilibili.com/list/*
 // @homepage     https://github.com/RevenLiu/BiliTimer
 // @supportURL   https://github.com/RevenLiu/BiliTimer/issues
 // @grant        none
